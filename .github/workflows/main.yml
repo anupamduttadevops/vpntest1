@@ -1,48 +1,17 @@
-name: SSH into EC2 Behind VPN
+name: Create and Print File
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
-  deploy:
+  create_and_print_file:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install OpenVPN
+      - name: Create a File and Write to It
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openvpn
-          
-      - name: Set Up VPN Configuration and Credentials
-        run: |
-          echo "${{ secrets.VPN_CONFIG }}" > vpn_config.ovpn
-          echo "${{ secrets.VPN_USERNAME }}" > vpn_username.txt
-          echo "${{ secrets.VPN_PASSWORD }}" > vpn_password.txt
-          echo "${{ secrets.VPN_USERNAME }}" > vpn_credentials.txt
-          echo "${{ secrets.VPN_PASSWORD }}" >> vpn_credentials.txt
-          chmod 600 vpn_credentials.txt
-      - name: Connect to VPN
-        run: |
-          sudo openvpn --config vpn_config.ovpn --auth-user-pass vpn_credentials.txt --daemon
-          sleep 10
-          sudo cat /var/log/syslog | grep openvpn
+          echo "Hello, this is a test message!" > testfile.txt
 
-
-      - name: SSH into EC2 and Create Folder
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: mkdir -p ~/new_folder
-
-      - name: Clean Up VPN Configuration
+      - name: Print the File Contents
         run: |
-          # Optional cleanup commands, if any
+          cat testfile.txt
