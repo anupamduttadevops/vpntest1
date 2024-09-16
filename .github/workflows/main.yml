@@ -14,23 +14,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install OpenVPN
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openvpn
-
-      - name: Set Up VPN Configuration and Credentials
-        run: |
-          echo "${{ secrets.VPN_CONFIG }}" > vpn_config.ovpn
-          echo "${{ secrets.VPN_USERNAME }}" > vpn_username.txt
-          echo "${{ secrets.VPN_PASSWORD }}" > vpn_password.txt
-          echo "${{ secrets.VPN_USERNAME }}" > vpn_credentials.txt
-          echo "${{ secrets.VPN_PASSWORD }}" >> vpn_credentials.txt
-
-      - name: Connect to VPN
-        run: |
-          sudo openvpn --config vpn_config.ovpn --auth-user-pass vpn_credentials.txt --daemon
-          sleep 10
+      - name: Connect OpenVPN
+        uses: swissbuechi/action-openvpn-client@v1.0.0
+        with:
+          host: ${{ secrets.VPN_HOST }}             # VPN server address
+          username: ${{ secrets.VPN_USERNAME }}     # VPN username
+          password: ${{ secrets.VPN_PASSWORD }}     # VPN password
+          # Optional parameters
+          logs: true                               # Optional: enable logging
+          # dns-server: ${{ secrets.DNS_SERVER }}    # Optional: DNS server if needed
+          ovpn-config: ${{ secrets.VPN_CONFIG }}  # Optional: VPN configuration file content
+          test-ping-ip-host: 8.8.8.8               # Optional: IP to test the connection
+          test-dns-host: example.com               # Optional: DNS to test the connection
+          port: 1194                               # Optional: port for the VPN connection
+          # otp-hex: ${{ secrets.OTP_HEX }}          # Optional: OTP hex if needed
+          # otp-timezone: ${{ secrets.OTP_TIMEZONE }} # Optional: OTP timezone
+          # ca: ${{ secrets.CA_CERTIFICATE }}        # Optional: CA certificate
+          # cert: ${{ secrets.CLIENT_CERTIFICATE }}  # Optional: Client certificate
+          # cert-key: ${{ secrets.CLIENT_KEY }}      # Optional: Client key
 
       - name: SSH into EC2 and Create Folder
         uses: appleboy/ssh-action@v0.1.6
@@ -43,4 +44,4 @@ jobs:
 
       - name: Clean Up VPN Configuration
         run: |
-          rm -f vpn_config.ovpn vpn_credentials.txt
+          # Optional cleanup commands, if any
