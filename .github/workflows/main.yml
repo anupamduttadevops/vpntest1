@@ -25,6 +25,7 @@ jobs:
           echo "${{ secrets.VPN_PASSWORD }}" > vpn_password.txt
           echo "${{ secrets.VPN_USERNAME }}" > vpn_credentials.txt
           echo "${{ secrets.VPN_PASSWORD }}" >> vpn_credentials.txt
+          chmod 600 vpn_credentials.txt
       - name: Connect to VPN
         run: |
           sudo openvpn --config vpn_config.ovpn --auth-user-pass vpn_credentials.txt --daemon
