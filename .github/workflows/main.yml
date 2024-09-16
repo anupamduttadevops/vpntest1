@@ -36,13 +36,23 @@ jobs:
          VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
         run: |
-         echo "${{ secrets.VPN_CONFIG }}" > vpn_config.ovpn
-         sudo openvpn --config vpn_config.ovpn --auth-user-pass /dev/stdin --daemon --verb 4 <<EOF
-         $VPN_USERNAME
-         $VPN_PASSWORD
-         EOF
-         sleep 30
-         sudo cat /var/log/syslog | grep openvpn
+          echo "$VPN_USERNAME" > vpn_creds.txt
+          echo "$VPN_PASSWORD" >> vpn_creds.txt
+          chmod 600 vpn_creds.txt
+          sudo openvpn --config vpn_config.ovpn --auth-user-pass vpn_creds.txt --daemon --verb 4
+          sleep 30
+
+          if pgrep openvpn > /dev/null
+          then
+           echo "OpenVPN process is running"
+           ip addr show
+          else
+           echo "OpenVPN process is not running"
+          sudo cat /var/log/syslog | grep openvpn
+          exit 1
+          fi
+
+          rm vpn_creds.txt
 
       - name: SSH into EC2 and Create Folder
         uses: appleboy/ssh-action@v0.1.6
