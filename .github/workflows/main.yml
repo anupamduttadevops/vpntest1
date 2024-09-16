@@ -36,6 +36,7 @@ jobs:
          VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
         run: |
+          cd $GITHUB_WORKSPACE
           echo "$VPN_USERNAME" > vpn_creds.txt
           echo "$VPN_PASSWORD" >> vpn_creds.txt
           chmod 600 vpn_creds.txt
