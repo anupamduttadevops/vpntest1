@@ -36,6 +36,7 @@ jobs:
          VPN_USERNAME: ${{ secrets.VPN_USERNAME }}
          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
         run: |
+         echo "${{ secrets.VPN_CONFIG }}" > vpn_config.ovpn
          sudo openvpn --config vpn_config.ovpn --auth-user-pass /dev/stdin --daemon --verb 4 <<EOF
          $VPN_USERNAME
          $VPN_PASSWORD
